@@ -1,0 +1,8 @@
+{
+  "name": "IDS HUB × Iparaná Pitch Deck",
+  "description": "Dashboard/Pitch Deck Interativo para a linha FLEXCO",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

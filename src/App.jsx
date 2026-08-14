@@ -6,10 +6,12 @@ import RoiCalculator from './components/RoiCalculator.jsx';
 import ProductCatalog from './components/ProductCatalog.jsx';
 import BrandPortfolioSection from './components/BrandPortfolioSection.jsx';
 import DocuseriesSection from './components/DocuseriesSection.jsx';
+import ProjectProposalView from './components/ProjectProposalView.jsx';
 import Footer from './components/Footer.jsx';
 import InspectionForm from './components/InspectionForm.jsx';
 
 export default function App() {
+  const [activeView, setActiveView] = useState('landing'); // 'landing' | 'proposal'
   const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
 
   const handleOpenModal = () => setIsInspectionModalOpen(true);
@@ -17,17 +19,30 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-950 font-sans">
-      {/* Top Navbar */}
-      <Navbar onOpenInspectionModal={handleOpenModal} />
+      {/* Top Navbar with Dual View Switcher */}
+      <Navbar 
+        activeView={activeView}
+        onSelectView={setActiveView}
+        onOpenInspectionModal={handleOpenModal} 
+      />
 
-      {/* Main Sections */}
+      {/* Main Content Area */}
       <main className="flex-grow">
-        <HeroSection onOpenInspectionModal={handleOpenModal} />
-        <RiskReversal onOpenInspectionModal={handleOpenModal} />
-        <ProductCatalog onOpenInspectionModal={handleOpenModal} />
-        <BrandPortfolioSection onOpenInspectionModal={handleOpenModal} />
-        <RoiCalculator onOpenInspectionModal={handleOpenModal} />
-        <DocuseriesSection onOpenInspectionModal={handleOpenModal} />
+        {activeView === 'landing' ? (
+          <>
+            <HeroSection onOpenInspectionModal={handleOpenModal} />
+            <RiskReversal onOpenInspectionModal={handleOpenModal} />
+            <ProductCatalog onOpenInspectionModal={handleOpenModal} />
+            <BrandPortfolioSection onOpenInspectionModal={handleOpenModal} />
+            <RoiCalculator onOpenInspectionModal={handleOpenModal} />
+            <DocuseriesSection onOpenInspectionModal={handleOpenModal} />
+          </>
+        ) : (
+          <ProjectProposalView 
+            onOpenInspectionModal={handleOpenModal}
+            onSwitchToLanding={() => setActiveView('landing')}
+          />
+        )}
       </main>
 
       {/* Footer */}

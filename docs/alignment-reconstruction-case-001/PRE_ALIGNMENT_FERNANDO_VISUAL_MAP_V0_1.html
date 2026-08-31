@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapa de capacidades — conversa de alinhamento</title>
+  <style>
+    :root {
+      --blue: #0a52cc;
+      --blue-dark: #082f73;
+      --blue-soft: #edf4ff;
+      --lime: #bfd04d;
+      --ink: #14223a;
+      --muted: #60708a;
+      --line: #d8e1ef;
+      --paper: #ffffff;
+      --wash: #f5f8fc;
+      --shadow: 0 16px 45px rgba(8, 47, 115, 0.10);
+      color-scheme: light;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 84% 3%, rgba(191, 208, 77, 0.18), transparent 24rem),
+        linear-gradient(180deg, #f8fbff 0, #eef4fb 100%);
+      color: var(--ink);
+      font-family: "Segoe UI", Arial, sans-serif;
+      line-height: 1.45;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto 48px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      color: var(--blue-dark);
+      padding: 9px 14px;
+      font: inherit;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    button.primary {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: white;
+    }
+
+    button:hover { filter: brightness(0.98); }
+    button:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(10, 82, 204, 0.25);
+      outline-offset: 2px;
+    }
+
+    header {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px 18px 0 0;
+      background: var(--blue);
+      color: white;
+      padding: 34px 38px 30px;
+      box-shadow: var(--shadow);
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      right: -95px;
+      top: -130px;
+      border: 34px solid rgba(191, 208, 77, 0.75);
+      border-radius: 50%;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+
+    h1 {
+      max-width: 800px;
+      margin: 0;
+      font-size: clamp(32px, 5vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -0.035em;
+    }
+
+    .subtitle {
+      max-width: 760px;
+      margin: 16px 0 0;
+      font-size: 17px;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .purpose {
+      border: 1px solid var(--line);
+      border-top: 0;
+      background: var(--paper);
+      padding: 24px 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .purpose strong { color: var(--blue-dark); }
+
+    .journey {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      border: 1px solid var(--line);
+      border-top: 0;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .journey div {
+      position: relative;
+      min-height: 76px;
+      display: grid;
+      place-items: center;
+      padding: 12px 24px 12px 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+      color: var(--blue-dark);
+      border-right: 1px solid var(--line);
+    }
+
+    .journey div:last-child { border-right: 0; }
+
+    .journey div:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      right: -9px;
+      top: 50%;
+      z-index: 2;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      background: white;
+      color: var(--blue);
+      font-size: 18px;
+    }
+
+    main {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .map,
+    .side-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .section-head {
+      padding: 24px 26px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: 24px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .capabilities {
+      list-style: none;
+      margin: 0;
+      padding: 0 26px 24px;
+    }
+
+    .capability {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(180px, 0.85fr) minmax(220px, 1.15fr) minmax(220px, 1fr);
+      gap: 16px;
+      align-items: center;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .capability:last-child { border-bottom: 0; }
+
+    .capability:not(:last-child)::after {
+      content: "↓";
+      position: absolute;
+      left: 18px;
+      bottom: -13px;
+      z-index: 2;
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: white;
+      color: var(--blue);
+      font-weight: 900;
+    }
+
+    .cap-name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .number {
+      flex: 0 0 auto;
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .cap-name strong {
+      display: block;
+      font-size: 16px;
+      line-height: 1.18;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #c9d5e6;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 11px;
+      font: inherit;
+    }
+
+    select[data-chosen="true"] {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: var(--blue-dark);
+      font-weight: 700;
+    }
+
+    .side-card { overflow: hidden; }
+
+    .side-card section {
+      padding: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .side-card section:last-child { border-bottom: 0; }
+
+    .side-card h3 {
+      margin: 0 0 12px;
+      color: var(--blue-dark);
+      font-size: 17px;
+    }
+
+    .side-card ul {
+      margin: 0;
+      padding-left: 19px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .side-card li + li { margin-top: 8px; }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend span {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 0 4px var(--blue-soft);
+    }
+
+    .dot.lime {
+      background: #8fa01f;
+      box-shadow: 0 0 0 4px rgba(191, 208, 77, 0.24);
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .summary div {
+      border-radius: 8px;
+      background: var(--wash);
+      padding: 10px;
+      text-align: center;
+    }
+
+    .summary strong {
+      display: block;
+      color: var(--blue-dark);
+      font-size: 20px;
+    }
+
+    .summary small { color: var(--muted); }
+
+    footer {
+      margin-top: 18px;
+      border-left: 5px solid var(--lime);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      padding: 16px 20px;
+      font-size: 13px;
+      box-shadow: var(--shadow);
+    }
+
+    @media (max-width: 900px) {
+      .journey { grid-template-columns: repeat(2, 1fr); }
+      .journey div { border-bottom: 1px solid var(--line); }
+      .journey div::after { display: none !important; }
+      main { grid-template-columns: 1fr; }
+      .capability { grid-template-columns: 1fr; }
+      .capability:not(:last-child)::after { left: 6px; }
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 16px, 1180px); margin-top: 8px; }
+      header { padding: 28px 22px 24px; }
+      .purpose { padding: 20px 22px; }
+      .journey { grid-template-columns: 1fr; }
+      .journey div { min-height: 56px; border-right: 0; }
+      .section-head { padding: 20px; }
+      .capabilities { padding: 0 20px 20px; }
+      .toolbar { justify-content: stretch; }
+      .toolbar button { flex: 1; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      .page { width: 100%; margin: 0; }
+      .toolbar { display: none; }
+      footer { display: none; }
+      header, .purpose, .journey, .map, .side-card, footer { box-shadow: none; }
+      header { border-radius: 0; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      main { grid-template-columns: 1fr; }
+      .side-card { margin-top: 10px; }
+      .capability { break-inside: avoid; }
+      select, textarea { appearance: none; border-color: #9aa9bd; }
+      .side-card section { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="toolbar" aria-label="Ações do mapa">
+      <button type="button" id="reset">Limpar marcações</button>
+      <button type="button" class="primary" onclick="window.print()">Imprimir / salvar PDF</button>
+    </div>
+
+    <header>
+      <p class="eyebrow">Conversa de alinhamento</p>
+      <h1>O que entendemos até aqui</h1>
+      <p class="subtitle">Um mapa simples para separar o que já existe, o que está mudando e quem deve ser responsável — antes de discutir qualquer solução.</p>
+    </header>
+
+    <section class="purpose">
+      <strong>Objetivo da conversa:</strong> entender o estado atual, as mudanças internas, as capacidades necessárias e as decisões ainda abertas. Este mapa não é diagnóstico fechado, escopo ou proposta.
+    </section>
+
+    <nav class="journey" aria-label="Sequência de alinhamento">
+      <div>Estado atual</div>
+      <div>Mudanças</div>
+      <div>Capacidades</div>
+      <div>Pessoas e ownership</div>
+      <div>Interno vs apoio externo</div>
+      <div>Decisões em aberto</div>
+    </nav>
+
+    <main>
+      <section class="map">
+        <div class="section-head">
+          <h2>Mapa de capacidades</h2>
+          <p>Marque uma opção de estado e uma de ownership para cada capacidade. Deixe em aberto quando ainda não houver resposta.</p>
+        </div>
+
+        <ol class="capabilities" id="capabilities">
+          <li class="capability" data-id="mercado">
+            <div class="cap-name"><span class="number">01</span><strong>Mercado</strong></div>
+            <div><label for="state-mercado">Estado</label><select id="state-mercado" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-mercado">Ownership</label><select id="owner-mercado" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+          <li class="capability" data-id="posicionamento">
+            <div class="cap-name"><span class="number">02</span><strong>Posicionamento / GTM</strong></div>
+            <div><label for="state-posicionamento">Estado</label><select id="state-posicionamento" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-posicionamento">Ownership</label><select id="owner-posicionamento" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+          <li class="capability" data-id="demanda">
+            <div class="cap-name"><span class="number">03</span><strong>Geração de demanda</strong></div>
+            <div><label for="state-demanda">Estado</label><select id="state-demanda" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-demanda">Ownership</label><select id="owner-demanda" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+          <li class="capability" data-id="qualificacao">
+            <div class="cap-name"><span class="number">04</span><strong>Tratamento / qualificação</strong></div>
+            <div><label for="state-qualificacao">Estado</label><select id="state-qualificacao" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-qualificacao">Ownership</label><select id="owner-qualificacao" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+          <li class="capability" data-id="comercial">
+            <div class="cap-name"><span class="number">05</span><strong>Comercial</strong></div>
+            <div><label for="state-comercial">Estado</label><select id="state-comercial" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-comercial">Ownership</label><select id="owner-comercial" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+          <li class="capability" data-id="dados">
+            <div class="cap-name"><span class="number">06</span><strong>CRM / dados</strong></div>
+            <div><label for="state-dados">Estado</label><select id="state-dados" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-dados">Ownership</label><select id="owner-dados" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+          <li class="capability" data-id="processos">
+            <div class="cap-name"><span class="number">07</span><strong>Follow-up / processos</strong></div>
+            <div><label for="state-processos">Estado</label><select id="state-processos" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-processos">Ownership</label><select id="owner-processos" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+          <li class="capability" data-id="medicao">
+            <div class="cap-name"><span class="number">08</span><strong>Medição / otimização</strong></div>
+            <div><label for="state-medicao">Estado</label><select id="state-medicao" data-field="state"><option value="">Sem marcar</option><option>Já existe</option><option>Está sendo construída</option><option>Precisa mudar</option><option>Ainda não sabemos</option></select></div>
+            <div><label for="owner-medicao">Ownership</label><select id="owner-medicao" data-field="owner"><option value="">Sem marcar</option><option>IPARANÁ</option><option>Compartilhado</option><option>IDS potencial</option><option>Ainda em aberto</option></select></div>
+          </li>
+        </ol>
+      </section>
+
+      <aside class="side-card">
+        <section>
+          <h3>Como usar</h3>
+          <ul>
+            <li>Começar pelo que acontece hoje.</li>
+            <li>Separar decisão de intenção.</li>
+            <li>Pedir um exemplo concreto.</li>
+            <li>Deixar em aberto quando faltar alguém.</li>
+            <li>Não transformar o mapa em solução.</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Perguntas finais</h3>
+          <ul>
+            <li>Qual capacidade é a principal restrição?</li>
+            <li>O que será construído internamente?</li>
+            <li>O que depende do Lucas ou de outra pessoa?</li>
+            <li>Onde apoio externo poderia ajudar — se houver necessidade?</li>
+            <li>Qual decisão precisa ficar mais clara?</li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Leitura do mapa</h3>
+          <div class="legend">
+            <span><i class="dot"></i> Estado da capacidade</span>
+            <span><i class="dot lime"></i> Ownership desejado</span>
+          </div>
+          <div class="summary" aria-live="polite">
+            <div><strong id="states-count">0</strong><small>estados marcados</small></div>
+            <div><strong id="owners-count">0</strong><small>owners marcados</small></div>
+          </div>
+        </section>
+
+        <section>
+          <h3>Notas da conversa</h3>
+          <label for="notes">Pontos que ainda precisam de confirmação</label>
+          <textarea id="notes" placeholder="Registre apenas o necessário para o readback..."></textarea>
+        </section>
+      </aside>
+    </main>
+
+    <footer>
+      Ferramenta de conversa. As marcações registram entendimento provisório e precisam de readback. Não representam diagnóstico, escopo, proposta ou compromisso de execução.
+    </footer>
+  </div>
+
+  <script>
+    (() => {
+      const storageKey = "iparana-pre-alignment-map-v0-1";
+      const selects = [...document.querySelectorAll("select")];
+      const notes = document.getElementById("notes");
+      const statesCount = document.getElementById("states-count");
+      const ownersCount = document.getElementById("owners-count");
+
+      function readStored() {
+        try { return JSON.parse(localStorage.getItem(storageKey) || "{}"); }
+        catch { return {}; }
+      }
+
+      function refresh() {
+        selects.forEach(select => select.dataset.chosen = String(Boolean(select.value)));
+        statesCount.textContent = selects.filter(s => s.dataset.field === "state" && s.value).length;
+        ownersCount.textContent = selects.filter(s => s.dataset.field === "owner" && s.value).length;
+      }
+
+      function save() {
+        const values = Object.fromEntries(selects.map(select => [select.id, select.value]));
+        values.notes = notes.value;
+        localStorage.setItem(storageKey, JSON.stringify(values));
+        refresh();
+      }
+
+      const stored = readStored();
+      selects.forEach(select => {
+        if (stored[select.id] !== undefined) select.value = stored[select.id];
+        select.addEventListener("change", save);
+      });
+      notes.value = stored.notes || "";
+      notes.addEventListener("input", save);
+
+      document.getElementById("reset").addEventListener("click", () => {
+        if (!window.confirm("Limpar todas as marcações e notas deste navegador?")) return;
+        localStorage.removeItem(storageKey);
+        selects.forEach(select => select.value = "");
+        notes.value = "";
+        refresh();
+      });
+
+      refresh();
+    })();
+  </script>
+</body>
+</html>

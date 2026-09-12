@@ -9,10 +9,6 @@ import {
   Minimize2,
   RotateCcw,
 } from 'lucide-react';
-import { GlobalWorkerOptions, getDocument, type PDFDocumentProxy } from 'pdfjs-dist';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-GlobalWorkerOptions.workerSrc = pdfWorker;
 
 const FILE_NAME = 'IDS_x_IPARANA_FLEXCO_PROPOSTA_FINAL_v2.pdf';
 const PDF_URL = '/proposta-final.pdf';
@@ -21,7 +17,7 @@ export function FinalProposalDeck() {
   const shellRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pdfRef = useRef<PDFDocumentProxy | null>(null);
+  const pdfRef = useRef<any>(null);
   const renderSeqRef = useRef(0);
 
   const [page, setPage] = useState(1);
@@ -47,7 +43,9 @@ export function FinalProposalDeck() {
     async function loadPdf() {
       try {
         setError(null);
-        const task = getDocument(PDF_URL);
+        const pdfjs = await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.mjs');
+        pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+        const task = pdfjs.getDocument(PDF_URL);
         const pdf = await task.promise;
 
         if (cancelled) {
@@ -113,7 +111,6 @@ export function FinalProposalDeck() {
       await pdfPage.render({
         canvasContext: bufferContext,
         viewport: renderViewport,
-        canvas: buffer,
       }).promise;
 
       if (seq !== renderSeqRef.current) return;

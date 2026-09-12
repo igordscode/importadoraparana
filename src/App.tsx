@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { ExecutiveProposalDeck } from './components/ExecutiveProposalDeck';
 import { InteractiveProposalPage } from './components/InteractiveProposalPage';
 import { PartnershipTeaser } from './components/PartnershipTeaser';
-import { FinalProposalWeb } from './components/FinalProposalWeb';
+import { FinalProposalDeck } from './components/FinalProposalDeck';
 
 function getView(pathname: string) {
   const path = pathname.toLowerCase();
@@ -42,7 +42,7 @@ export default function App() {
   }, [view]);
 
   if (view === 'final-proposal') {
-    return <FinalProposalWeb />;
+    return <FinalProposalDeck />;
   }
 
   if (view === 'interactive') {

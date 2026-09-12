@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { PROPOSAL_GZIP_BASE64 } from '../proposalPayload';
 import {
   ArrowLeft,
   ArrowRight,
   Download,
-  Expand,
   Home,
   LoaderCircle,
   Maximize2,
@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 
 const TOTAL_PAGES = 25;
-const PART_COUNT = 8;
 const FILE_NAME = 'IDS_x_IPARANA_FLEXCO_PROPOSTA_FINAL_v2.pdf';
 
 function decodeBase64(value: string) {
@@ -59,25 +58,9 @@ export function FinalProposalDeck() {
 
     async function preparePdf() {
       try {
-        setLoadingText('Carregando deck final');
-
-        const parts = await Promise.all(
-          Array.from({ length: PART_COUNT }, (_, index) =>
-            fetch(`/proposal-final/part-${index}.txt`, { cache: 'force-cache' }).then((response) => {
-              if (!response.ok) {
-                throw new Error(`Não foi possível carregar a parte ${index + 1} da proposta.`);
-              }
-
-              return response.text();
-            }),
-          ),
-        );
-
-        if (!active) return;
-
         setLoadingText('Montando experiência de apresentação');
 
-        const compressed = decodeBase64(parts.join('').replace(/\s/g, ''));
+        const compressed = decodeBase64(PROPOSAL_GZIP_BASE64);
         const pdfBytes = await gunzip(compressed);
 
         if (!active) return;

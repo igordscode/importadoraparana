@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/proposta-executiva", "destination": "/" },
+    { "source": "/projeto-piloto", "destination": "/" },
+    { "source": "/deck-executivo", "destination": "/" },
+    { "source": "/interativo", "destination": "/" },
+    { "source": "/comercial", "destination": "/" },
+    { "source": "/planos", "destination": "/" }
+  ]
+}

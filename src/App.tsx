@@ -2,12 +2,16 @@ import { useEffect } from 'react';
 import { ExecutiveProposalDeck } from './components/ExecutiveProposalDeck';
 import { InteractiveProposalPage } from './components/InteractiveProposalPage';
 import { PartnershipTeaser } from './components/PartnershipTeaser';
+import { FinalProposalWeb } from './components/FinalProposalWeb';
 
 function getView(pathname: string) {
   const path = pathname.toLowerCase();
 
+  if (path.includes('proposta-executiva')) {
+    return 'final-proposal';
+  }
+
   if (
-    path.includes('proposta-executiva') ||
     path.includes('interativo') ||
     path.includes('comercial') ||
     path.includes('planos')
@@ -28,12 +32,18 @@ export default function App() {
   useEffect(() => {
     if (view === 'teaser') {
       document.title = 'Iparaná Export × IDS Flows';
+    } else if (view === 'final-proposal') {
+      document.title = 'Proposta Pós-Alinhamento | IDS × IPARANÁ';
     } else if (view === 'interactive') {
       document.title = 'Proposta Executiva | Iparaná × IDS Flows';
     } else {
       document.title = 'Projeto Piloto | Iparaná × IDS Flows';
     }
   }, [view]);
+
+  if (view === 'final-proposal') {
+    return <FinalProposalWeb />;
+  }
 
   if (view === 'interactive') {
     return <InteractiveProposalPage />;

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { PROPOSAL_GZIP_BASE64 } from '../proposalPayload';
 import {
   ArrowLeft,
   ArrowRight,
@@ -25,24 +24,12 @@ function decodeBase64(value: string) {
   return bytes;
 }
 
-async function gunzip(bytes: Uint8Array) {
-  if (!('DecompressionStream' in window)) {
-    throw new Error('Este navegador não oferece suporte ao modo de apresentação.');
-  }
-
-  const stream = new Blob([bytes])
-    .stream()
-    .pipeThrough(new DecompressionStream('gzip'));
-
-  return new Uint8Array(await new Response(stream).arrayBuffer());
-}
-
 export function FinalProposalDeck() {
   const shellRef = useRef<HTMLDivElement>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [fullscreen, setFullscreen] = useState(false);
-  const [loadingText, setLoadingText] = useState('Preparando proposta executiva');
+  const [loadingText] = useState('Carregando proposta final');
   const [error, setError] = useState<string | null>(null);
 
   const goTo = useCallback((nextPage: number) => {
@@ -53,35 +40,7 @@ export function FinalProposalDeck() {
   const next = useCallback(() => goTo(page + 1), [goTo, page]);
 
   useEffect(() => {
-    let active = true;
-    let objectUrl: string | null = null;
-
-    async function preparePdf() {
-      try {
-        setLoadingText('Montando experiência de apresentação');
-
-        const compressed = decodeBase64(PROPOSAL_GZIP_BASE64);
-        const pdfBytes = await gunzip(compressed);
-
-        if (!active) return;
-
-        objectUrl = URL.createObjectURL(
-          new Blob([pdfBytes], { type: 'application/pdf' }),
-        );
-
-        setPdfUrl(objectUrl);
-      } catch (caught) {
-        if (!active) return;
-        setError(caught instanceof Error ? caught.message : 'Não foi possível abrir a proposta.');
-      }
-    }
-
-    preparePdf();
-
-    return () => {
-      active = false;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
+    setPdfUrl('/proposta-final.pdf');
   }, []);
 
   useEffect(() => {
@@ -140,7 +99,7 @@ export function FinalProposalDeck() {
   const download = () => {
     if (!pdfUrl) return;
     const anchor = document.createElement('a');
-    anchor.href = pdfUrl;
+    anchor.href = '/proposta-final.pdf';
     anchor.download = FILE_NAME;
     anchor.click();
   };

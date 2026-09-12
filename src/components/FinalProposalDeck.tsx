@@ -13,17 +13,6 @@ import {
 const TOTAL_PAGES = 25;
 const FILE_NAME = 'IDS_x_IPARANA_FLEXCO_PROPOSTA_FINAL_v2.pdf';
 
-function decodeBase64(value: string) {
-  const binary = window.atob(value);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let i = 0; i < binary.length; i += 1) {
-    bytes[i] = binary.charCodeAt(i);
-  }
-
-  return bytes;
-}
-
 export function FinalProposalDeck() {
   const shellRef = useRef<HTMLDivElement>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);

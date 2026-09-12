@@ -1,34 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { ExecutiveProposalDeck } from './components/ExecutiveProposalDeck';
 import { InteractiveProposalPage } from './components/InteractiveProposalPage';
+import { PartnershipTeaser } from './components/PartnershipTeaser';
+
+function getView(pathname: string) {
+  const path = pathname.toLowerCase();
+
+  if (
+    path.includes('proposta-executiva') ||
+    path.includes('interativo') ||
+    path.includes('comercial') ||
+    path.includes('planos')
+  ) {
+    return 'interactive';
+  }
+
+  if (path.includes('projeto-piloto') || path.includes('deck-executivo')) {
+    return 'proposal';
+  }
+
+  return 'teaser';
+}
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'proposal' | 'interactive'>(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname.toLowerCase();
-      if (path.includes('interativo') || path.includes('comercial') || path.includes('planos')) {
-        return 'interactive';
-      }
-    }
-    return 'interactive'; // Default to interactive 3-tier proposal page
-  });
+  const view = getView(typeof window !== 'undefined' ? window.location.pathname : '/');
 
   useEffect(() => {
-    const handlePopState = () => {
-      const path = window.location.pathname.toLowerCase();
-      if (path.includes('interativo') || path.includes('comercial') || path.includes('planos')) {
-        setCurrentView('interactive');
-      } else {
-        setCurrentView('proposal');
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    if (view === 'teaser') {
+      document.title = 'Iparaná Export × IDS Flows';
+    } else if (view === 'interactive') {
+      document.title = 'Proposta Executiva | Iparaná × IDS Flows';
+    } else {
+      document.title = 'Projeto Piloto | Iparaná × IDS Flows';
+    }
+  }, [view]);
 
-  if (currentView === 'interactive') {
+  if (view === 'interactive') {
     return <InteractiveProposalPage />;
   }
 
-  return <ExecutiveProposalDeck />;
+  if (view === 'proposal') {
+    return <ExecutiveProposalDeck />;
+  }
+
+  return <PartnershipTeaser />;
 }
